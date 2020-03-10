@@ -14,9 +14,9 @@ import pl.put.poznan.mainForm.*;
 public class App
 {
     public static void main( String[] args ) {
-        new loginForm();
-        //new mainForm();
-        /*Connection conn = null;
+        //new loginForm();
+
+        Connection conn = null;
         try {
             conn = Controller.login("inf136823", "inf136823");
         }
@@ -24,8 +24,13 @@ public class App
             Logger.getLogger(App.class.getName()).log(Level.SEVERE, "nie udało się połączyć z bazą danych", ex);
             System.exit(-1);
         }
+        //Controller controller = new Controller();
+        //new ErrorWindow("chuj");
+        new AdministartorPanel(conn);
+        //new EditRecord(2);
+        //new mainForm();
 
-        String tableName = "pracownicy";
+        /*String tableName = "pracownicy";
         String query = "select * from pracownicy";
         Controller controller = new Controller();
 
