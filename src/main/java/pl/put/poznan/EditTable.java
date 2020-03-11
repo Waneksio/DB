@@ -64,7 +64,8 @@ public class EditTable {
             elements = new String[][]{{""}};
             System.out.println(e);
         }
-        createUIComponents(elements, keyIndexes, selectedRecords);
+        int[] colsToDisplay = controller.getColumnsToDisplay(table);
+        createUIComponents(elements, colsToDisplay, selectedRecords);
         myList.setModel(model);
         myList.setVisibleRowCount(5);
         myFrame = new JFrame();
@@ -121,6 +122,8 @@ public class EditTable {
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
+                new ErrorWindow("Element deleted");
+                myFrame.dispose();
             }
         });
     }

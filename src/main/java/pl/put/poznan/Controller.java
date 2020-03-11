@@ -6,43 +6,46 @@ import java.util.List;
 import java.util.Properties;
 import pl.put.poznan.Table;
 
+import javax.management.Query;
+
 public class Controller {
     public List<Table> tables = new ArrayList<Table>();
     Controller() {
         Record address = new Record("address", 1, 50);
+        Record buildingAddress = new Record("address", 1, 50, "buildings");
         Record name = new Record("name", 1, 50);
         Record start_date = new Record("start_date", 3, -1);
         Record location = new Record("location", 1, 50);
         Record people = new Record("people", 2, 4, true);
-        Record member = new Record("member", 2, 5);
-        Record happening_name = new Record("happening_name", 1, 50);
+        Record member = new Record("member", 2, 5, "members");
+        Record happening_name = new Record("happening_name", 1, 50, "happenings");
         Record happening_start = new Record("happening_start", 3, -1);
         Record id = new Record("id", 2, 5);
         Record surname = new Record("surname", 1, 50);
         Record email = new Record("email", 1, 100);
         Record phone_nr = new Record( "phone_nr", 2, 9, true);
-        Record warrant = new Record("warrant", 1, 9);
-        Record sponsor = new Record("sponsor", 1, 50);
+        Record warrant = new Record("warrant", 1, 9, "warrants");
+        Record sponsor = new Record("sponsor", 1, 50, "sponsors");
         Record salary = new Record("salary", 2, 6);
         Record description = new Record("description", 1, 200);
         Record notes = new Record("notes", 1, 200);
-        Record end_date = new Record("end_date", 3, -1);
-        Record worker = new Record("worker", 2, 5);
-        Record project_id = new Record("project_id", 1, 50);
+        Record end_date = new Record("end_date", 3, -1, true);
+        Record worker = new Record("worker", 2, 5, "workers");
+        Record project_id = new Record("project_id", 1, 50, "projects");
         Record room_nr = new Record("room_nr", 2, 4);
         Record alms = new Record("alms", 2, 10, true);
         Record privileges_list = new Record("privileges_list", 1, 200);
-        Record position = new Record("position", 1, 50);
-        Record building = new Record("building", 1, 50);
-        Record room = new Record("room", 2, 4);
+        Record position = new Record("position", 1, 50, "positions");
+        Record building = new Record("building", 1, 50, "buildings");
+        Record room = new Record("room", 2, 4, "rooms");
         Record id_prac = new Record("id_prac", 2, 6);
         Record nazwisko = new Record("nazwisko", 1, 15, true);
-        Record etat = new Record("etat", 1, 10, true);
+        Record etat = new Record("etat", 1, 10, true, "etaty");
         Record id_szefa = new Record("id_szefa", 2, 6, true);
         Record zatrudniony = new Record("zatrudniony", 3, -1, true);
         Record placa_pod = new Record("placa_pod", 2, 7, true);
         Record placa_dod = new Record("placa_dod", 2, 6, true);
-        Record id_zesp = new Record("id_zesp", 2, 4, true);
+        Record id_zesp = new Record("id_zesp", 2, 4, true, "zespoly");
         List<Record> buildings = new ArrayList<Record>();
         buildings.add(address);
         buildings.add(name);
@@ -80,7 +83,7 @@ public class Controller {
         projects_participations.add(project_id);
         List<Record> rooms = new ArrayList<Record>();
         rooms.add(room_nr);
-        rooms.add(address);
+        rooms.add(buildingAddress);
         List<Record> sponsors = new ArrayList<Record>();
         sponsors.add(name);
         sponsors.add(alms);
@@ -109,7 +112,7 @@ public class Controller {
         tables.add(new Table("buildings", buildings, new int[] {1}));
         tables.add(new Table("happenings", happenings, new int[] {1, 2}));
         tables.add(new Table("happenings_participations", happenings_participations, new int[] {1, 2, 3}));
-        tables.add(new Table("members", members, new int[] {1}));
+        tables.add(new Table("members", members, new int[] {1}, new int[] {1, 2, 3}));
         tables.add(new Table("organization_details", organization_details, new int[] {1, 2, 3}));
         tables.add(new Table("positions", positions, new int[] {1}));
         tables.add(new Table("projects", projects, new int[] {1, 4}));
@@ -117,7 +120,7 @@ public class Controller {
         tables.add(new Table("rooms", rooms, new int[] {1, 2}));
         tables.add(new Table("sponsors", sponsors, new int[] {1}));
         tables.add(new Table("warrants", warrants, new int[] {1}));
-        tables.add(new Table("workers", workers, new int[] {1}));
+        tables.add(new Table("workers", workers, new int[] {1}, new int[] {1, 2, 3}));
         tables.add(new Table( "pracownicy", pracownicy, new int[] {1}));
     }
     boolean updateTable(Connection connection, String tableName, String columns, String records, List<String> keyValues, List<String> keyColumns, boolean change, List<String> columnsArray, List<String> recordsArray) throws SQLException {
@@ -193,7 +196,7 @@ public class Controller {
         return true;
     }
 
-    ResultSet getResultSet(Connection connection, String query) throws SQLException{
+    static ResultSet getResultSet(Connection connection, String query) throws SQLException{
         Statement stmt;
         stmt = connection.createStatement();
 
@@ -249,6 +252,53 @@ public class Controller {
             j++;
         }
         return resultTable;
+    }
+
+    List<String> getId (Connection connection, String tableName) throws SQLException{
+        List<String> result = new ArrayList<String>();
+        String query = "select * from ";
+        query += tableName;
+        int columnCount = 0;
+        int[] keyIndexes = new int[] {};
+        for (Table table : tables) {
+            if (table.tableName.equals(tableName)) {
+                keyIndexes = table.keyAttributes;
+                columnCount = table.columnsCount;
+            }
+        }
+        System.out.println(keyIndexes);
+        ResultSet rs = this.getResultSet(connection, query);
+        while (rs.next()) {
+            String partialResult = "";
+            for (int i = 0; i < columnCount; i++) {
+                for (int index : keyIndexes) {
+                    if (i + 1 == index) {
+                        partialResult += rs.getString(i + 1);
+                        if (i < columnCount - 1)
+                            partialResult += " ";
+                    }
+                }
+            }
+            result.add(partialResult);
+        }
+        return result;
+    }
+    int[] getColumnsToDisplay(String tableName) {
+        for (Table table : tables) {
+            if (table.tableName == tableName) {
+                return table.mColsToDisplay;
+            }
+        }
+        return new int[] {};
+    }
+
+    Table getTable (String tableName) {
+        for (Table table : tables) {
+            if (table.tableName == tableName) {
+                return table;
+            }
+        }
+        return null;
     }
 }
 

@@ -1,26 +1,23 @@
 package pl.put.poznan;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class informationWindow {
     private JTable table1;
     private JPanel myPanel;
     private JButton zmieńHasłoButton;
     private JButton saveButton;
+    private JTextField textField5;
     private JTextField textField1;
+    private JTextField textField4;
     private JTextField textField2;
     private JTextField textField3;
-    private JTextField textField4;
-    private JTextField textField5;
-    private JTextField textField6;
-    private JTextField textField7;
-    private JTextField textField8;
     private JButton editButton;
     private JButton editButton1;
     private JComboBox comboBox1;
@@ -44,8 +41,13 @@ public class informationWindow {
         return myFrame.isShowing();
     }
 
-    public informationWindow() {
-        Password = "";
+    public informationWindow(final String id, String name, String surname, String email, String phone, String warrant, final Table table, final Connection connection) {
+        Password = surname;
+        textField1.setText(id);
+        textField2.setText(name);
+        textField4.setText(email);
+        textField5.setText(phone);
+        textField3.setText(warrant);
         comboBox1.addItem("+48");
         comboBox1.addItem("+42");
         comboBox1.addItem("+69");
@@ -60,12 +62,12 @@ public class informationWindow {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (editButton.getText() == "Edit") {
-                    textField3.setEditable(true);
+                    textField4.setEditable(true);
                     editButton.setText("Save");
                 }
                 else {
                     editButton.setText("Edit");
-                    textField3.setEditable(false);
+                    textField4.setEditable(false);
                 }
             }
         });
@@ -73,13 +75,13 @@ public class informationWindow {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (editButton1.getText() == "Edit") {
-                    textField1.setEditable(true);
+                    textField5.setEditable(true);
                     editButton1.setText("Save");
                     comboBox1.setEnabled(true);
                 }
                 else {
                     editButton1.setText("Edit");
-                    textField1.setEditable(false);
+                    textField5.setEditable(false);
                     comboBox1.setEnabled(false);
                 }
             }
@@ -92,6 +94,29 @@ public class informationWindow {
                 else if(!passForm.isOpen()) {
                     passForm = null;
                     passForm = new ChangePasswordForm(getMe());
+                }
+            }
+        });
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (passForm != null) {
+                    if (passForm.isOpen())
+                        return;
+                }
+                String newPhone = textField5.getText();
+                String newEmail = textField4.getText();
+                String newPassword = getPassword();
+                System.out.println(table.tableName);
+                String query = "update " + table.tableName + " set phone_nr = " + newPhone + ", email = '" + newEmail + "', surname = '" + newPassword + "' where id = " + id;
+                System.out.println(query);
+                try {
+                    Statement stmt = connection.createStatement();
+                    stmt.executeUpdate(query);
+                } catch (SQLException exception) {
+                    System.out.println(exception);
+                    myFrame.dispose();
+                    return;
                 }
             }
         });

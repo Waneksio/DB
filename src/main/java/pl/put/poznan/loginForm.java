@@ -3,6 +3,12 @@ package pl.put.poznan;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class loginForm {
     private JPanel myPanel;
@@ -14,15 +20,58 @@ public class loginForm {
     private JLabel Info;
     private JLabel warningLabel;
     private JButton myButton;
+    private ResultSet rsWorkers;
+    private ResultSet rsMembers;
+    private Connection mConnection;
 
-    private boolean login(String username, String password) {
-        if (username.equals("kutas")) {
-            return password.equals("dupa");
+    private List<String> login(String username, String password) throws SQLException{
+        List<String> result = new ArrayList<>();
+        String warrants = "";
+        String query = "select privileges_list from workers join warrants on workers.warrant = warrants.name where id = ";
+        query += username + " AND surname = '" + password + "'";
+        System.out.println(query);
+        ResultSet rs = Controller.getResultSet(mConnection, query);
+        if (rs.next()) {
+            System.out.println("XD");
+            warrants = rs.getString(1);
+            result.add("workers");
+            result.add(warrants);
         }
-        return false;
+        if (warrants == "super_user") {
+            return result;
+        }
+
+        query = "select privileges_list from members join warrants on members.warrant = warrants.name where id = ";
+        query += username + " AND surname = '" + password + "'";
+        System.out.println(query);
+        rs = Controller.getResultSet(mConnection, query);
+        if (rs.next()) {
+            System.out.println(rs.getString(1));
+            warrants = rs.getString(1);
+            result.add("members");
+            result.add(warrants);
+            return result;
+        }
+        if (result.isEmpty()) {
+            result.add("0");
+            result.add("0");
+        }
+        return result;
     }
 
-    public loginForm() {
+    public loginForm(final Connection connection) {
+        final String tableName = "";
+        mConnection = connection;
+        try {
+            rsWorkers = Controller.getResultSet(connection, "select * from workers");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        try {
+            rsMembers = Controller.getResultSet(connection, "select * from members");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         myButton = new JButton("login");
         myButton.setLocation(10, 30);
         myButton.setSize(10, 20);
@@ -48,15 +97,26 @@ public class loginForm {
         passwordField1.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == 10) {
-                    if (login(textField1.getText(), passwordField1.getText())) {
-                        myFrame.dispose();
-                        new mainMenu();
+                try {
+                    if (e.getKeyCode() == 10) {
+                        String login = textField1.getText();
+                        List<String> warrants = login(login, passwordField1.getText());
+                        System.out.println(warrants.get(1));
+                        if (warrants.get(1).equals("regular_user")) {
+                            myFrame.dispose();
+                            new mainMenu(connection, warrants.get(0), login);
+                        }
+                        if (warrants.get(1).equals("super_user")) {
+                            myFrame.dispose();
+                            new AdministartorPanel(connection);
+                        }
+                        warningLabel.setText("Could not log-in");
+                        textField1.setText("");
+                        passwordField1.setText("");
+                        textField1.grabFocus();
                     }
-                    warningLabel.setText("Could not log-in");
-                    textField1.setText("");
-                    passwordField1.setText("");
-                    textField1.grabFocus();
+                } catch (SQLException exception) {
+                    System.out.println(exception);
                 }
             }
         });
@@ -64,14 +124,25 @@ public class loginForm {
         zalogujButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (login(textField1.getText(), passwordField1.getText())) {
-                    myFrame.dispose();
-                    new mainMenu();
+                try {
+                    String login = textField1.getText();
+                    List<String> warrants = login(login, passwordField1.getText());
+                    if (warrants.get(1).equals("regular_user")) {
+                        myFrame.dispose();
+                        new mainMenu(connection, warrants.get(0), login);
+                    }
+                    if (warrants.get(1).equals("super_user")) {
+                        myFrame.dispose();
+                        new AdministartorPanel(connection);
+                    }
+                    warningLabel.setText("Could not log-in");
+                    textField1.setText("");
+                    passwordField1.setText("");
+                    textField1.grabFocus();
                 }
-                warningLabel.setText("Could not log-in");
-                textField1.setText("");
-                passwordField1.setText("");
-                textField1.grabFocus();
+                catch (SQLException exception) {
+                    System.out.println(exception);
+                }
             }
         });
         zakończButton.addActionListener(new ActionListener() {

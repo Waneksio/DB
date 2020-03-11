@@ -88,10 +88,10 @@ public class AdministartorPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (myTable == null)
-                    myTable = new EditTable("events", connection);
+                    myTable = new EditTable("happenings", connection);
                 else if (!myTable.isOpen()){
                     myTable = null;
-                    myTable = new EditTable("events", connection);
+                    myTable = new EditTable("happenings", connection);
                 }
             }
         });

@@ -26,7 +26,7 @@ public class App
         }
         //Controller controller = new Controller();
         //new ErrorWindow("chuj");
-        new AdministartorPanel(conn);
+        new loginForm(conn);
         //new EditRecord(2);
         //new mainForm();
 

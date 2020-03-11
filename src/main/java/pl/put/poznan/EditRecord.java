@@ -15,25 +15,25 @@ public class EditRecord {
     private JButton saveChangesButton;
     private JButton cancelButton;
     private JButton button1;
-    private JTextField textField1;
+    public JTextField textField1;
     private JButton button2;
-    private JTextField textField2;
+    public JTextField textField2;
     private JButton button3;
-    private JTextField textField3;
+    public JTextField textField3;
     private JLabel label1;
     private JLabel label2;
     private JLabel label3;
-    private JTextField textField4;
+    public JTextField textField4;
     private JButton button4;
-    private JTextField textField5;
+    public JTextField textField5;
     private JButton button5;
-    private JTextField textField6;
+    public JTextField textField6;
     private JButton button6;
-    private JTextField textField7;
+    public JTextField textField7;
     private JButton button7;
-    private JTextField textField8;
+    public JTextField textField8;
     private JButton button8;
-    private JTextField textField9;
+    public JTextField textField9;
     private JButton button9;
     private JLabel label4;
     private JLabel label5;
@@ -50,6 +50,8 @@ public class EditRecord {
     public boolean isOpen() {
         return myFrame.isShowing();
     }
+
+    public EditRecord getMe() {return this;}
 
     public EditRecord(final int columnCount, final String[] colNames, final String[] record, final Connection conn, final Controller controller, final String tableName, final boolean change, final Table table) {
         /* SETUP
@@ -160,6 +162,18 @@ public class EditRecord {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (button1.getText() == "Edit") {
+                    for (Record record1 : table.mRecords) {
+                        if (table.mRecords.indexOf(record1) == buttons.indexOf(button1)) {
+                            if (record1.mForeignKey != null) {
+                                try {
+                                    new HintWindow(controller.getId(conn, record1.mForeignKey), textField1);
+                                } catch (SQLException ex) {
+                                    ex.printStackTrace();
+                                }
+                                return;
+                            }
+                        }
+                    }
                     button1.setText("Save");
                     textField1.setEditable(true);
                 }
@@ -173,6 +187,18 @@ public class EditRecord {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (button2.getText() == "Edit") {
+                    for (Record record1 : table.mRecords) {
+                        if (table.mRecords.indexOf(record1) == buttons.indexOf(button2)) {
+                            if (record1.mForeignKey != null) {
+                                try {
+                                    new HintWindow(controller.getId(conn, record1.mForeignKey), textField2);
+                                } catch (SQLException ex) {
+                                    ex.printStackTrace();
+                                }
+                                return;
+                            }
+                        }
+                    }
                     button2.setText("Save");
                     textField2.setEditable(true);
                 }
@@ -186,6 +212,18 @@ public class EditRecord {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (button3.getText() == "Edit") {
+                    for (Record record1 : table.mRecords) {
+                        if (table.mRecords.indexOf(record1) == buttons.indexOf(button3)) {
+                            if (record1.mForeignKey != null) {
+                                try {
+                                    new HintWindow(controller.getId(conn, record1.mForeignKey), textField3);
+                                } catch (SQLException ex) {
+                                    ex.printStackTrace();
+                                }
+                                return;
+                            }
+                        }
+                    }
                     button3.setText("Save");
                     textField3.setEditable(true);
                 }
@@ -199,6 +237,18 @@ public class EditRecord {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (button4.getText() == "Edit") {
+                    for (Record record1 : table.mRecords) {
+                        if (table.mRecords.indexOf(record1) == buttons.indexOf(button4)) {
+                            if (record1.mForeignKey != null) {
+                                try {
+                                    new HintWindow(controller.getId(conn, record1.mForeignKey), textField4);
+                                } catch (SQLException ex) {
+                                    ex.printStackTrace();
+                                }
+                                return;
+                            }
+                        }
+                    }
                     button4.setText("Save");
                     textField4.setEditable(true);
                 }
@@ -212,6 +262,18 @@ public class EditRecord {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (button5.getText() == "Edit") {
+                    for (Record record1 : table.mRecords) {
+                        if (table.mRecords.indexOf(record1) == buttons.indexOf(button5)) {
+                            if (record1.mForeignKey != null) {
+                                try {
+                                    new HintWindow(controller.getId(conn, record1.mForeignKey), textField5);
+                                } catch (SQLException ex) {
+                                    ex.printStackTrace();
+                                }
+                                return;
+                            }
+                        }
+                    }
                     button5.setText("Save");
                     textField5.setEditable(true);
                 }
@@ -225,6 +287,18 @@ public class EditRecord {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (button6.getText() == "Edit") {
+                    for (Record record1 : table.mRecords) {
+                        if (table.mRecords.indexOf(record1) == buttons.indexOf(button6)) {
+                            if (record1.mForeignKey != null) {
+                                try {
+                                    new HintWindow(controller.getId(conn, record1.mForeignKey), textField6);
+                                } catch (SQLException ex) {
+                                    ex.printStackTrace();
+                                }
+                                return;
+                            }
+                        }
+                    }
                     button6.setText("Save");
                     textField6.setEditable(true);
                 }
@@ -238,6 +312,18 @@ public class EditRecord {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (button7.getText() == "Edit") {
+                    for (Record record1 : table.mRecords) {
+                        if (table.mRecords.indexOf(record1) == buttons.indexOf(button7)) {
+                            if (record1.mForeignKey != null) {
+                                try {
+                                    new HintWindow(controller.getId(conn, record1.mForeignKey), textField7);
+                                } catch (SQLException ex) {
+                                    ex.printStackTrace();
+                                }
+                                return;
+                            }
+                        }
+                    }
                     button7.setText("Save");
                     textField7.setEditable(true);
                 }
@@ -251,6 +337,18 @@ public class EditRecord {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (button8.getText() == "Edit") {
+                    for (Record record1 : table.mRecords) {
+                        if (table.mRecords.indexOf(record1) == buttons.indexOf(button8)) {
+                            if (record1.mForeignKey != null) {
+                                try {
+                                    new HintWindow(controller.getId(conn, record1.mForeignKey), textField8);
+                                } catch (SQLException ex) {
+                                    ex.printStackTrace();
+                                }
+                                return;
+                            }
+                        }
+                    }
                     button8.setText("Save");
                     textField8.setEditable(true);
                 }
@@ -264,6 +362,18 @@ public class EditRecord {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (button9.getText() == "Edit") {
+                    for (Record record1 : table.mRecords) {
+                        if (table.mRecords.indexOf(record1) == buttons.indexOf(button9)) {
+                            if (record1.mForeignKey != null) {
+                                try {
+                                    new HintWindow(controller.getId(conn, record1.mForeignKey), textField9);
+                                } catch (SQLException ex) {
+                                    ex.printStackTrace();
+                                }
+                                return;
+                            }
+                        }
+                    }
                     button9.setText("Save");
                     textField9.setEditable(true);
                 }
