@@ -18,16 +18,30 @@ public class EditTable {
     private JList myList;
     private JButton addButton;
     private JPanel myPanel;
+    private JTextField textField1;
+    private JButton searchButton;
     private JFrame myFrame;
     private DefaultListModel model;
     private EditRecord editRecordWindow;
+    boolean wait;
+
+    public void setWait(boolean wait) {
+        this.wait = wait;
+    }
+
+    public EditTable getMe() { return this; }
 
     public boolean isOpen() {
         return myFrame.isShowing();
     }
 
     private void createUIComponents(String[][] elements, int[] columnsToDisplay, String[] selectedRecords) {
+        wait = true;
         model = new DefaultListModel();
+        int[] temporary = new int[20];
+        for (int i = 0; i < 20; i++ ) {
+            temporary[i] = i;
+        }
         int j = 0;
         for (String[] elementsArray : elements) {
             String modelText = "";
@@ -75,6 +89,7 @@ public class EditTable {
         myFrame.add(myPanel, BorderLayout.CENTER);
         myFrame.setTitle("Projekt");
         myFrame.setVisible(true);
+        System.out.println(model.elementAt(0));
 
         final String[][] finalElements = elements;
         final Table finalTableProperties = tableProperties;
@@ -85,7 +100,8 @@ public class EditTable {
                 int index = myList.getSelectedIndex();
                 if (index == -1)
                     return;
-                editRecordWindow = new EditRecord(columnCount, colNames, finalElements[index], connection, controller, table, false, finalTableProperties);
+                int trueIndex = model.indexOf(myList.getSelectedValue().toString());
+                editRecordWindow = new EditRecord(columnCount, colNames, finalElements[trueIndex], connection, controller, table, false, finalTableProperties);
             }
         });
 
@@ -103,13 +119,17 @@ public class EditTable {
                 int index = myList.getSelectedIndex();
                 if (index == -1)
                     return;
+                int trueIndex = model.indexOf(myList.getSelectedValue().toString());
                 List<String> keyColumns = new ArrayList<String>();
                 List<String> keyValues = new ArrayList<String>();
+
                 for (int i = 0; i < finalTableProperties.columnsCount; i++) {
                     for (int keyColumn : finalTableProperties.keyAttributes) {
                         if (keyColumn == i + 1) {
                             String keyValue = "";
                             keyValue += finalElements[index][i + 1];
+                            if (finalTableProperties.mRecords.get(i).mDataType == 3)
+                                keyValue = keyValue.substring(0, keyValue.indexOf(" "));
                             if (finalTableProperties.mRecords.get(i).mDataType != 2)
                                 keyValue = "'" + keyValue + "'";
                             keyValues.add(keyValue);
@@ -124,6 +144,20 @@ public class EditTable {
                 }
                 new ErrorWindow("Element deleted");
                 myFrame.dispose();
+            }
+        });
+        searchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DefaultListModel newModel = new DefaultListModel();
+                myList.setModel(newModel);
+                String text = textField1.getText();
+                for (int i = 0; i < model.size(); i++) {
+                    if (model.elementAt(i).toString().contains(text)) {
+                        newModel.addElement(model.elementAt(i));
+
+                    }
+                }
             }
         });
     }

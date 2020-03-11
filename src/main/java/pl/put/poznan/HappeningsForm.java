@@ -17,6 +17,8 @@ public class HappeningsForm {
     private JButton showDetailsButton;
     private JPanel myPanel;
     private JList list1;
+    private JTextField textField1;
+    private JButton searchButton;
     private DefaultListModel model;
     private ResultSet rs;
     private List<String> happeningName;
@@ -86,6 +88,19 @@ public class HappeningsForm {
                 } catch (SQLException ex) {
                     new ErrorWindow("You cannot join this event");
                     //ex.printStackTrace();
+                }
+            }
+        });
+        searchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DefaultListModel newModel = new DefaultListModel();
+                list1.setModel(newModel);
+                String text = textField1.getText();
+                for (int i = 0; i < model.size(); i++) {
+                    if (model.elementAt(i).toString().contains(text)) {
+                        newModel.addElement(model.elementAt(i));
+                    }
                 }
             }
         });
