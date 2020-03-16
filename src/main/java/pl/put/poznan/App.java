@@ -1,6 +1,8 @@
 package pl.put.poznan;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -11,6 +13,8 @@ import pl.put.poznan.mainForm.*;
  * Hello world!
  *
  */
+
+
 public class App
 {
     public static void main( String[] args ) {
@@ -24,6 +28,7 @@ public class App
             Logger.getLogger(App.class.getName()).log(Level.SEVERE, "nie udało się połączyć z bazą danych", ex);
             System.exit(-1);
         }
+
         //Controller controller = new Controller();
         //new ErrorWindow("chuj");
         new loginForm(conn);

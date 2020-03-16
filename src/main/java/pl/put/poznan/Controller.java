@@ -11,41 +11,43 @@ import javax.management.Query;
 public class Controller {
     public List<Table> tables = new ArrayList<Table>();
     Controller() {
-        Record address = new Record("address", 1, 50);
-        Record buildingAddress = new Record("address", 1, 50, "buildings");
-        Record name = new Record("name", 1, 50);
-        Record start_date = new Record("start_date", 3, -1);
-        Record location = new Record("location", 1, 50);
-        Record people = new Record("people", 2, 4, true);
-        Record member = new Record("member", 2, 5, "members");
-        Record happening_name = new Record("happening_name", 1, 50, "happenings");
-        Record happening_start = new Record("happening_start", 3, -1);
-        Record id = new Record("id", 2, 5);
-        Record surname = new Record("surname", 1, 50);
-        Record email = new Record("email", 1, 100);
-        Record phone_nr = new Record( "phone_nr", 2, 9, true);
-        Record warrant = new Record("warrant", 1, 9, "warrants");
-        Record sponsor = new Record("sponsor", 1, 50, "sponsors");
-        Record salary = new Record("salary", 2, 6);
-        Record description = new Record("description", 1, 200);
-        Record notes = new Record("notes", 1, 200);
-        Record end_date = new Record("end_date", 3, -1, true);
-        Record worker = new Record("worker", 2, 5, "workers");
-        Record project_id = new Record("project_id", 1, 50, "projects");
-        Record room_nr = new Record("room_nr", 2, 4);
-        Record alms = new Record("alms", 2, 10, true);
-        Record privileges_list = new Record("privileges_list", 1, 200);
-        Record position = new Record("position", 1, 50, "positions");
-        Record building = new Record("building", 1, 50, "buildings");
-        Record room = new Record("room", 2, 4, "rooms");
-        Record id_prac = new Record("id_prac", 2, 6);
-        Record nazwisko = new Record("nazwisko", 1, 15, true);
-        Record etat = new Record("etat", 1, 10, true, "etaty");
-        Record id_szefa = new Record("id_szefa", 2, 6, true);
-        Record zatrudniony = new Record("zatrudniony", 3, -1, true);
-        Record placa_pod = new Record("placa_pod", 2, 7, true);
-        Record placa_dod = new Record("placa_dod", 2, 6, true);
-        Record id_zesp = new Record("id_zesp", 2, 4, true, "zespoly");
+        Record address = new Record("address", DataType.T_TEXT, 50, new String[] {"rooms"});
+        Record warrantName = new Record("name", DataType.T_TEXT, 50, new String[] {"workers", "members"});
+        Record positionName = new Record("name", DataType.T_TEXT, 50, new String[] {"workers"});
+        Record buildingAddress = new Record("address", DataType.T_TEXT, 50, "buildings");
+        Record name = new Record("name", DataType.T_TEXT, 50);
+        Record start_date = new Record("start_date", DataType.T_DATE, -1);
+        Record location = new Record("location", DataType.T_TEXT, 50);
+        Record people = new Record("people", DataType.T_NUMBER, 4, true);
+        Record member = new Record("member", DataType.T_NUMBER, 5, "members");
+        Record happening_name = new Record("happening_name", DataType.T_TEXT, 50, "happenings");
+        Record happening_start = new Record("happening_start", DataType.T_DATE, -1);
+        Record id = new Record("id", DataType.T_ID, 5, true);
+        Record surname = new Record("surname", DataType.T_SINGLE_WORD, 50);
+        Record email = new Record("email", DataType.T_EMAIL, 100);
+        Record phone_nr = new Record( "phone_nr", DataType.T_PHONE, 9, true);
+        Record warrant = new Record("warrant", DataType.T_SINGLE_WORD, 9, "warrants");
+        Record sponsor = new Record("sponsor", DataType.T_TEXT, 50, "sponsors");
+        Record salary = new Record("salary", DataType.T_NUMBER, 6);
+        Record description = new Record("description", DataType.T_TEXT, 200);
+        Record notes = new Record("notes", DataType.T_TEXT, 200);
+        Record end_date = new Record("end_date", DataType.T_DATE, -1, true);
+        Record worker = new Record("worker", DataType.T_NUMBER, 5, "workers");
+        Record project_id = new Record("project_id", DataType.T_TEXT, 50, "projects");
+        Record room_nr = new Record("room_nr", DataType.T_NUMBER, 4, new String[] {"workers"});
+        Record alms = new Record("alms", DataType.T_NUMBER, 10, true);
+        Record privileges_list = new Record("privileges_list", DataType.T_TEXT, 200);
+        Record position = new Record("position", DataType.T_SINGLE_WORD, 50, "positions");
+        Record building = new Record("building", DataType.T_TEXT, 50, "buildings");
+        Record room = new Record("room", DataType.T_NUMBER, 4, "rooms");
+        Record id_prac = new Record("id_prac", DataType.T_NUMBER, 6);
+        Record nazwisko = new Record("nazwisko", DataType.T_SINGLE_WORD, 15, true);
+        Record etat = new Record("etat", DataType.T_SINGLE_WORD, 10, true, "etaty");
+        Record id_szefa = new Record("id_szefa", DataType.T_NUMBER, 6, true);
+        Record zatrudniony = new Record("zatrudniony", DataType.T_DATE, -1, true);
+        Record placa_pod = new Record("placa_pod", DataType.T_NUMBER, 7, true);
+        Record placa_dod = new Record("placa_dod", DataType.T_NUMBER, 6, true);
+        Record id_zesp = new Record("id_zesp", DataType.T_NUMBER, 4, true, "zespoly");
         List<Record> buildings = new ArrayList<Record>();
         buildings.add(address);
         buildings.add(name);
@@ -70,7 +72,7 @@ public class Controller {
         organization_details.add(happening_name);
         organization_details.add(happening_start);
         List<Record> positions = new ArrayList<Record>();
-        positions.add(name);
+        positions.add(positionName);
         positions.add(salary);
         List<Record> projects = new ArrayList<Record>();
         projects.add(name);
@@ -88,7 +90,7 @@ public class Controller {
         sponsors.add(name);
         sponsors.add(alms);
         List<Record> warrants = new ArrayList<Record>();
-        warrants.add(name);
+        warrants.add(warrantName);
         warrants.add(privileges_list);
         List<Record> workers = new ArrayList<Record>();
         workers.add(id);
@@ -121,19 +123,62 @@ public class Controller {
         tables.add(new Table("sponsors", sponsors, new int[] {1}));
         tables.add(new Table("warrants", warrants, new int[] {1}));
         tables.add(new Table("workers", workers, new int[] {1}, new int[] {1, 2, 3}));
-        tables.add(new Table( "pracownicy", pracownicy, new int[] {1}));
+        tables.add(new Table("pracownicy", pracownicy, new int[] {1}));
     }
-    boolean updateTable(Connection connection, String tableName, String columns, String records, List<String> keyValues, List<String> keyColumns, boolean change, List<String> columnsArray, List<String> recordsArray) throws SQLException {
 
-        String checkQuery = "select * from " + tableName + " where ";
+    boolean existsInTable (Connection connection, String tableName, List<String> keyColumns, List<String> keyValues) throws SQLException {
+        String query = "select * from " + tableName + " where ";
+        for (int i = 0; i < keyValues.size(); i++) {
+            query += keyColumns.get(i) + " = " + keyValues.get(i);
+            if (i < keyValues.size() - 1)
+                query += " AND ";
+        }
+        System.out.println(query);
+        ResultSet rs = getResultSet(connection, query);
+        return rs.next();
+    }
+
+    boolean updateTable(Connection connection, String tableName, String columns, String records, List<String> keyValues, List<String> keyColumns, boolean change, List<String> columnsArray, List<String> recordsArray, List<String> oldValues) throws SQLException {
+        if (!change) {
+            Table temporaryTable = getTableByName(tableName);
+            int j = 0;
+            for (String keyColumn : keyColumns) {
+                Record temporaryRecord = getRecordByName(temporaryTable, keyColumn);
+                for (String relatedTableName : temporaryRecord.mRelated) {
+                    Table relatedTable = getTableByName(relatedTableName);
+                    for (Record record : relatedTable.mRecords) {
+                        if (record.mForeignKey != null) {
+                            if (record.mForeignKey.equals(tableName)) {
+                                if (isColliding(relatedTableName, connection, record.mColName, oldValues.get(j), record.mDataType)) {
+                                    for (int i = 0; i < keyValues.size(); i++) {
+                                        if (!keyValues.get(i).equals(oldValues.get(i)))
+                                            return false;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                j++;
+            }
+        }
+        Statement stmt;
+        stmt = connection.createStatement();
+
+        if (keyValues.isEmpty() && (change)) {
+            String query = "insert into " + tableName + " (" + columns + ") values (" + records + ")";
+            System.out.println(query);
+            stmt.executeUpdate(query);
+            return true;
+        }
+        String checkQuery = "select * from " + tableName + " WHERE ";
         for (int i = 0; i < keyValues.size(); i++) {
             checkQuery += keyColumns.get(i) + " = " + keyValues.get(i);
             if (i < keyValues.size() - 1)
                 checkQuery += " AND ";
         }
 
-        Statement stmt;
-        stmt = connection.createStatement(); //(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        System.out.println(checkQuery);
 
         ResultSet rs = stmt.executeQuery(checkQuery);
 
@@ -141,13 +186,10 @@ public class Controller {
             if (change)
                 return false;
         }
-        else {
-            if (!change)
-                return false;
-        }
 
         if (change) {
             String query = "insert into " + tableName + " (" + columns + ") values (" + records + ")";
+            System.out.println(query);
             stmt.executeUpdate(query);
             return true;
         }
@@ -160,16 +202,58 @@ public class Controller {
             }
             query += " where ";
             for (int i = 0; i < keyColumns.size(); i++) {
-                query += keyColumns.get(i) + " = " + keyValues.get(i);
+                query += keyColumns.get(i) + " = " + oldValues.get(i);
                 if (i < keyColumns.size() - 1)
                     query += " AND ";
             }
+            System.out.println(query);
             stmt.executeQuery(query);
             return true;
         }
     }
 
+    private boolean isColliding(String tableName, Connection connection, String columnName, String valueToCheck, DataType dataType) throws SQLException{
+        String query = "select * from " + tableName + " where " + columnName + " = " + valueToCheck;
+        System.out.println(query);
+        ResultSet rs = getResultSet(connection, query);
+        return rs.next();
+    }
+
+    private Table getTableByName(String name) {
+        for (Table table : tables) {
+            if (table.tableName.equals(name))
+                return table;
+        }
+        return null;
+    }
+
+    private Record getRecordByName(Table table, String name) {
+        for (Record record : table.mRecords) {
+            if (record.mColName.equals(name))
+                return record;
+        }
+        return null;
+    }
+
     boolean deleteFromTable(Connection connection, String tableName, List<String> keyColumns, List<String> keyValues) throws SQLException {
+        Table temporaryTable = getTableByName(tableName);
+        int j = 0;
+        for (String keyColumn : keyColumns) {
+            Record temporaryRecord = getRecordByName(temporaryTable, keyColumn);
+            for (String relatedTableName : temporaryRecord.mRelated) {
+                Table relatedTable = getTableByName(relatedTableName);
+                for (Record record : relatedTable.mRecords) {
+                    if (record.mForeignKey != null) {
+                        if (record.mForeignKey.equals(tableName)) {
+                            if (isColliding(relatedTableName, connection, record.mColName, keyValues.get(j), record.mDataType)) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+            j++;
+        }
 
         String checkQuery = "select * from " + tableName + " where ";
         for (int i = 0; i < keyValues.size(); i++) {
@@ -187,11 +271,13 @@ public class Controller {
             return false;
 
         String query = "delete from " + tableName + " where ";
+
         for (int i = 0; i < keyColumns.size(); i++) {
             query += keyColumns.get(i) + " = " + keyValues.get(i);
             if (i < keyColumns.size() - 1)
                 query += " AND ";
         }
+
         stmt.executeQuery(query);
         return true;
     }
@@ -273,9 +359,9 @@ public class Controller {
             for (int i = 0; i < columnCount; i++) {
                 for (int index : keyIndexes) {
                     if (i + 1 == index) {
+                        if ((i > 0) && (!partialResult.equals("")))
+                            partialResult += ", ";
                         partialResult += rs.getString(i + 1);
-                        if (i < columnCount - 1)
-                            partialResult += " ";
                     }
                 }
             }
@@ -283,6 +369,7 @@ public class Controller {
         }
         return result;
     }
+
     int[] getColumnsToDisplay(String tableName) {
         for (Table table : tables) {
             if (table.tableName == tableName) {

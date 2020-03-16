@@ -36,11 +36,40 @@ public class HintWindow {
                     return;
                 }
                 String value = model.get(index).toString();
-                if (value.contains(" ")) {
-                    value = value.substring(0, value.indexOf(" "));
-                }
 
                 textField.setText(value);
+                myFrame.dispose();
+            }
+        });
+    }
+
+    public HintWindow(List<String> elements, final List<JTextField> textFields) {
+
+        for (String element : elements) {
+            model.addElement(element);
+        }
+
+        myFrame = new JFrame();
+        myFrame.setLocation(650, 370);
+        myFrame.setSize(500, 280);
+        myFrame.setResizable(false);
+        myFrame.add(myPanel, BorderLayout.CENTER);
+        myFrame.setTitle("Available values");
+        myFrame.setVisible(true);
+
+        OKButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int index = myList.getSelectedIndex();
+                if (index == -1) {
+                    myFrame.dispose();
+                    return;
+                }
+                String value = model.get(index).toString();
+                if (value.contains(" ")) {
+                    textFields.get(1).setText(value.substring(0, value.indexOf(",")));
+                    textFields.get(0).setText(value.substring(value.indexOf(",") + 2, value.length()));
+                }
                 myFrame.dispose();
             }
         });

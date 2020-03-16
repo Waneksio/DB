@@ -53,7 +53,7 @@ public class EditRecord {
 
     public EditRecord getMe() {return this;}
 
-    public EditRecord(final int columnCount, final String[] colNames, final String[] record, final Connection conn, final Controller controller, final String tableName, final boolean change, final Table table) {
+    public EditRecord(final int columnCount, final String[] colNames, final String[] record, final Connection conn, final Controller controller, final String tableName, final boolean change, final Table table, final String id) {
         /* SETUP
         ---------------------------------------------------------------------------*/
         /* BUTTONS SETUP
@@ -103,13 +103,28 @@ public class EditRecord {
         i = 0;
 
         for (JTextField textField : textFields) {
-            if (table.mRecords.get(i).mDataType == 3)
+            if (table.mRecords.get(i).mDataType == DataType.T_DATE)
                 textField.setToolTipText("Date format: 'YYYY-MM-DD'");
-            if (table.mRecords.get(i).mDataType == 1) {
-                String message = "String of characters of a maximum length of " + table.mRecords.get(i).mCharNumber + " characters";
+            if (table.mRecords.get(i).mDataType == DataType.T_TEXT) {
+                String message = "Any text of a maximum length of " + table.mRecords.get(i).mCharNumber + " characters";
                 textField.setToolTipText(message);
             }
-            if (table.mRecords.get(i).mDataType == 2) {
+            if (table.mRecords.get(i).mDataType == DataType.T_EMAIL)
+                textField.setToolTipText("Email must be in format XXX@domain");
+            if (table.mRecords.get(i).mDataType == DataType.T_SINGLE_WORD)
+                textField.setToolTipText("Cannot contain space and special characters");
+            if (table.mRecords.get(i).mDataType == DataType.T_PHONE)
+                textField.setToolTipText("Phone number must have exactly 9 digits");
+            if (table.mRecords.get(i).mDataType == DataType.T_ID) {
+                buttons.get(i).setVisible(false);
+                textFields.get(i).setText(record[i]);
+                System.out.println(record[i]);
+                if (textFields.get(i).getText().equals("")) {
+                    labels.get(i).setVisible(false);
+                    textFields.get(i).setVisible(false);
+                }
+            }
+            if (table.mRecords.get(i).mDataType == DataType.T_NUMBER) {
                 String message = "Any number of a maximum length of " + table.mRecords.get(i).mCharNumber + " digits";
                 textField.setToolTipText(message);
             }
@@ -123,6 +138,8 @@ public class EditRecord {
 
         i = 0;
         for (JButton button : buttons) {
+            if (labels.get(i).getText().equals("building"))
+                button.setVisible(false);
             if (i < columnCount) {
                 i++;
                 continue;
@@ -366,7 +383,12 @@ public class EditRecord {
                         if (table.mRecords.indexOf(record1) == buttons.indexOf(button9)) {
                             if (record1.mForeignKey != null) {
                                 try {
-                                    new HintWindow(controller.getId(conn, record1.mForeignKey), textField9);
+                                    if (label9.getText().equals("room")) {
+                                        List<JTextField> temporaryList = new ArrayList<>();
+                                        temporaryList.add(textField8);
+                                        temporaryList.add(textField9);
+                                        new HintWindow(controller.getId(conn, record1.mForeignKey), temporaryList);
+                                    }
                                 } catch (SQLException ex) {
                                     ex.printStackTrace();
                                 }
@@ -399,13 +421,45 @@ public class EditRecord {
                 List<String> columnsArray = new ArrayList<String>();
                 List<String> keyValues = new ArrayList<String>();
                 List<String> keyColumns = new ArrayList<String>();
+                if (label1.getText().equals("id") && !change) {
+                    keyColumns.add("id");
+                    keyValues.add("'"+id+"'");
+                }
+
                 for (Record record1 : table.mRecords) {
                     String valueToInsert = "";
                     if ((!record1.mNullable) && textFields.get(k).getText().equals("")) {
                         new ErrorWindow("Value " + record1.mColName + " cannot be empty");
                         return;
                     }
-                    if (record1.mDataType == 2) {
+
+                    if (record1.mDataType == DataType.T_EMAIL) {
+                        if (!(textFields.get(k).getText().matches("[a-z_A-Z\\.]+@+[a-zA-Z]+\\.+.[a-z_A-Z\\.]*")) && !(textFields.get(k).getText().equals(""))) {
+                            new ErrorWindow("Invalid e-mail address");
+                            return;
+                        }
+                        if (textFields.get(k).getText().length() > record1.mCharNumber) {
+                            new ErrorWindow("To many characters at " + record1.mColName);
+                            return;
+                        }
+                        if (!textFields.get(k).getText().equals(""))
+                            valueToInsert += "'" + textFields.get(k).getText() + "'";
+                    }
+
+                    if (record1.mDataType == DataType.T_PHONE) {
+                        if (!(textFields.get(k).getText().matches("[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]")) && !(textFields.get(k).getText().equals(""))) {
+                            new ErrorWindow("Invalid phone number");
+                            return;
+                        }
+                        if (textFields.get(k).getText().length() > record1.mCharNumber) {
+                            new ErrorWindow("To many characters at " + record1.mColName);
+                            return;
+                        }
+                        if (!textFields.get(k).getText().equals(""))
+                            valueToInsert += "'" + textFields.get(k).getText() + "'";
+                    }
+
+                    if (record1.mDataType == DataType.T_NUMBER) {
                         if ((textFields.get(k).getText().matches("[^0-9]*?")) && !(textFields.get(k).getText().equals(""))) {
                             new ErrorWindow("Invalid data type at " + record1.mColName);
                             return;
@@ -418,7 +472,7 @@ public class EditRecord {
                             valueToInsert += textFields.get(k).getText();
                     }
 
-                    if (record1.mDataType == 3) {
+                    if (record1.mDataType == DataType.T_DATE) {
                         String dateVal = textFields.get(k).getText();
                         if (!dateVal.equals("")) {
                             if (!dateVal.matches("[1-2][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]")) {
@@ -431,10 +485,6 @@ public class EditRecord {
                             index = dateVal.indexOf("-");
                             int month = Integer.parseInt(dateVal.substring(0, index));
                             int day = Integer.parseInt(dateVal.substring(index + 1, dateVal.length()));
-                            if (year > 2020) {
-                                new ErrorWindow("There is no such date " + record1.mColName);
-                                return;
-                            }
                             if (month > 12) {
                                 new ErrorWindow("There is no such date " + record1.mColName);
                                 return;
@@ -442,16 +492,6 @@ public class EditRecord {
                             if (day > 31) {
                                 new ErrorWindow("There is no such date " + record1.mColName);
                                 return;
-                            }
-                            if (year == 2020) {
-                                if (month > 3) {
-                                    new ErrorWindow("There is no such date " + record1.mColName);
-                                    return;
-                                }
-                                if (day > 11) {
-                                    new ErrorWindow("There is no such date " + record1.mColName);
-                                    return;
-                                }
                             }
                             if (month == 2) {
                                 if ((year % 4) == 0) {
@@ -484,8 +524,8 @@ public class EditRecord {
                         if (!textFields.get(k).getText().equals(""))
                             valueToInsert += "'" + textFields.get(k).getText() + "'";
                     }
-                    if (record1.mDataType == 1) {
-                        if (!(textFields.get(k).getText().matches("\\w*"))) {
+                    if (record1.mDataType == DataType.T_SINGLE_WORD) {
+                        if (!(textFields.get(k).getText().matches("[a-zA-Z]*"))) {
                             if (!(textFields.get(k).getText().equals(""))) {
                                 new ErrorWindow("Value at " + record1.mColName + " contains forbidden characters");
                                 return;
@@ -498,8 +538,25 @@ public class EditRecord {
                         if (!textFields.get(k).getText().equals(""))
                             valueToInsert += "'" + textFields.get(k).getText() + "'";
                     }
+
+                    if (record1.mDataType == DataType.T_TEXT) {
+                        System.out.println(textFields.get(k).getText());
+                        if (!(textFields.get(k).getText().matches("[a-zA-Z_0-9\\s]*"))) {
+                            if (!(textFields.get(k).getText().equals(""))) {
+                                new ErrorWindow("Value at " + record1.mColName + " contains forbidden characters");
+                                return;
+                            }
+                            if (textFields.get(k).getText().length() > record1.mCharNumber) {
+                                new ErrorWindow("To many characters at " + record1.mColName);
+                                return;
+                            }
+                        }
+                        if (!textFields.get(k).getText().equals(""))
+                            valueToInsert += "'" + textFields.get(k).getText() + "'";
+                    }
+
                     if (valueToInsert != "") {
-                        if (k != 0) {
+                        if (values.length() != 0) {
                             values += ", ";
                             columns += ", ";
                         }
@@ -513,23 +570,45 @@ public class EditRecord {
                         columnsArray.add(record1.mColName);
                         values += valueToInsert;
                         columns += record1.mColName;
-                        k++;
+                    }
+                    k++;
+                }
+
+                List<String> oldValues = new ArrayList<>();
+                for (int i : table.keyAttributes) {
+                    if (table.mRecords.get(i - 1).mDataType == DataType.T_NUMBER)
+                        oldValues.add(record[i]);
+                    else
+                        oldValues.add("'" + record[i] + "'");
+                }
+
+                boolean result;
+                boolean isEverythingOK;
+                if (!change) {
+                    try {
+                        result = controller.updateTable(conn, tableName, columns, values, keyValues, keyColumns, false, columnsArray, valuesArray, oldValues);
+                        if (!result)
+                            new ErrorWindow("You cannot change these attributes!");
+                        else
+                            new ErrorWindow("Element has been changed");
+                    } catch (SQLException exception) {
+                        new ErrorWindow("An error occurred while removing this element");
+                        myFrame.dispose();
+                    }
+                }
+                else {
+                    try {
+                        result = controller.updateTable(conn, tableName, columns, values, keyValues, keyColumns, true, columnsArray, valuesArray, oldValues);
+                        if (!result)
+                            new ErrorWindow("This element already exists");
+                        else
+                            new ErrorWindow("Element has been added");
+                    } catch (SQLException exception) {
+                        new ErrorWindow("An error occurred while adding this element");
+                        myFrame.dispose();
                     }
                 }
 
-                System.out.println(columns);
-                System.out.println(values);
-                boolean result;
-                try {
-                    result = controller.updateTable(conn, tableName, columns, values, keyValues, keyColumns, change, columnsArray, valuesArray);
-                }catch (SQLException exception) {
-                    System.out.println(exception);
-                    result = false;
-                }
-                if (!result)
-                    new ErrorWindow("This element already exists");
-                else
-                    myFrame.dispose();
             }
         });
     }

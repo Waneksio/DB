@@ -1,6 +1,6 @@
 package pl.put.poznan;
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.StringStack;
+//import com.sun.org.apache.xalan.internal.xsltc.compiler.util.StringStack;
 
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicSliderUI;
@@ -24,10 +24,6 @@ public class EditTable {
     private DefaultListModel model;
     private EditRecord editRecordWindow;
     boolean wait;
-
-    public void setWait(boolean wait) {
-        this.wait = wait;
-    }
 
     public EditTable getMe() { return this; }
 
@@ -89,7 +85,6 @@ public class EditTable {
         myFrame.add(myPanel, BorderLayout.CENTER);
         myFrame.setTitle("Projekt");
         myFrame.setVisible(true);
-        System.out.println(model.elementAt(0));
 
         final String[][] finalElements = elements;
         final Table finalTableProperties = tableProperties;
@@ -97,18 +92,19 @@ public class EditTable {
         showEditButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                String id = myList.getSelectedValue().toString();
                 int index = myList.getSelectedIndex();
                 if (index == -1)
                     return;
                 int trueIndex = model.indexOf(myList.getSelectedValue().toString());
-                editRecordWindow = new EditRecord(columnCount, colNames, finalElements[trueIndex], connection, controller, table, false, finalTableProperties);
+                editRecordWindow = new EditRecord(columnCount, colNames, finalElements[trueIndex], connection, controller, table, false, finalTableProperties, id.substring(0, id.indexOf(" ")));
             }
         });
 
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                editRecordWindow = new EditRecord(columnCount, colNames, finalElements[0], connection, controller, table, true, finalTableProperties);
+                editRecordWindow = new EditRecord(columnCount, colNames, finalElements[0], connection, controller, table, true, finalTableProperties, "-1");
             }
         });
 
@@ -128,24 +124,33 @@ public class EditTable {
                         if (keyColumn == i + 1) {
                             String keyValue = "";
                             keyValue += finalElements[index][i + 1];
-                            if (finalTableProperties.mRecords.get(i).mDataType == 3)
+                            if (finalTableProperties.mRecords.get(i).mDataType == DataType.T_DATE)
                                 keyValue = keyValue.substring(0, keyValue.indexOf(" "));
-                            if (finalTableProperties.mRecords.get(i).mDataType != 2)
+                            if (finalTableProperties.mRecords.get(i).mDataType != DataType.T_NUMBER)
                                 keyValue = "'" + keyValue + "'";
                             keyValues.add(keyValue);
                             keyColumns.add(colNames[i]);
                         }
                     }
                 }
+                boolean success = false;
+                boolean isEverythingOK = true;
                 try {
-                    controller.deleteFromTable(connection, table, keyColumns, keyValues);
+                    success = controller.deleteFromTable(connection, table, keyColumns, keyValues);
                 } catch (SQLException ex) {
-                    ex.printStackTrace();
+                    new ErrorWindow("There was an error while deleting element");
+                    isEverythingOK = false;
                 }
-                new ErrorWindow("Element deleted");
+                if (isEverythingOK) {
+                    if (success)
+                        new ErrorWindow("Element deleted");
+                    else
+                        new ErrorWindow("Element is using by other table. Delete canceled");
+                }
                 myFrame.dispose();
             }
         });
+
         searchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -161,6 +166,7 @@ public class EditTable {
             }
         });
     }
+
     private void createUIComponents() {
         model = new DefaultListModel();
         myList = new JList(model);

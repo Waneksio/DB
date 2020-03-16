@@ -17,7 +17,6 @@ public class loginForm {
     private JPasswordField passwordField1;
     private JButton zakończButton;
     private JButton zalogujButton;
-    private JLabel Info;
     private JLabel warningLabel;
     private JButton myButton;
     private ResultSet rsWorkers;
@@ -110,12 +109,13 @@ public class loginForm {
                             myFrame.dispose();
                             new AdministartorPanel(connection);
                         }
-                        warningLabel.setText("Could not log-in");
+                        warningLabel.setText("Wrong username or password");
                         textField1.setText("");
                         passwordField1.setText("");
                         textField1.grabFocus();
                     }
                 } catch (SQLException exception) {
+                    warningLabel.setText("Wrong username or password");
                     System.out.println(exception);
                 }
             }
@@ -135,13 +135,14 @@ public class loginForm {
                         myFrame.dispose();
                         new AdministartorPanel(connection);
                     }
-                    warningLabel.setText("Could not log-in");
+                    warningLabel.setText("Wrong username or password");
                     textField1.setText("");
                     passwordField1.setText("");
                     textField1.grabFocus();
                 }
                 catch (SQLException exception) {
                     System.out.println(exception);
+                    warningLabel.setText("Wrong username or password");
                 }
             }
         });

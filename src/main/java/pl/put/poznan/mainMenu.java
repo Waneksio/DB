@@ -18,6 +18,7 @@ public class mainMenu {
     private JButton happeningsButton;
     private JButton projectsButton;
     private JButton myHappeningsButton;
+    private JButton myProjectsButton;
     private JFrame myFrame;
     private informationWindow infWindow;
     private HappeningsForm hapForm;
@@ -115,10 +116,10 @@ public class mainMenu {
                     return;
                 }
                 if (proForm == null)
-                    proForm = new ProjectsForm();
+                    proForm = new ProjectsForm(myTable, userId, connection);
                 else if(!proForm.isOpen()) {
                     proForm = null;
-                    proForm = new ProjectsForm();
+                    proForm = new ProjectsForm(myTable, userId, connection);
                 }
             }
         });
@@ -126,6 +127,12 @@ public class mainMenu {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new myHappenings(connection, myTable, userId);
+            }
+        });
+        myProjectsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                new myProjects(connection, myTable, userId);
             }
         });
     }
